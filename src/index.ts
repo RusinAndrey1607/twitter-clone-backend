@@ -8,22 +8,27 @@ import { authRouter } from "./routes/authRouter";
 import { errorMiddleware } from "./middlewares/errorMiddleware";
 import { tweetRouter } from "./routes/tweetRouter";
 import { commentRouter } from "./routes/commentRouter";
-
+import path from "path";
+import { upload } from "./libs/multer";
 config();
 
 const port = process.env.PORT || 8000;
 const app = express();
 
-app.use(express.json());
+app.use("/static", express.static(path.join(__dirname, "static")));
+app.use(express.json({limit:1000000,
+}));
 app.use(cookieParser());
-
 app.use(cors());
-
 app.use("/auth", authRouter);
 app.use("/profile", profileRouter);
 app.use("/tweet", tweetRouter);
 app.use("/comment", commentRouter);
 app.use(errorMiddleware);
+
+app.post("/test", upload.single("avatar"), (req, res) => {
+  return res.send(req.file);
+});
 
 const start = async () => {
   try {

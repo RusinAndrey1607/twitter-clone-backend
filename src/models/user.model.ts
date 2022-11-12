@@ -30,7 +30,7 @@ User.init(
     password: { type: DataTypes.STRING, allowNull: false },
     blocked: { type: DataTypes.BOOLEAN, defaultValue: false },
   },
-  { sequelize, modelName: "user", freezeTableName: true }
+  { sequelize, modelName: "users", freezeTableName: true }
 );
 
 User.hasOne(Profile, {

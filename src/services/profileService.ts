@@ -4,6 +4,7 @@ import {
   ProfileAttributes,
   ProfileCreationAttributes,
 } from "../models/profile.model";
+import { deleteFile } from "../utils/deleteUtil";
 
 class ProfileService {
   async createProfile(
@@ -56,6 +57,115 @@ class ProfileService {
       throw ApiError.BadRequest(`Profile with username ${username} not found`);
     }
     return profile;
+  }
+
+  async updateProfile(profile: ProfileCreationAttributes) {
+    const oldProfile = await Profile.findOne({
+      where: {
+        userId: profile.userId,
+      },
+    });
+
+    //Delete  old avatar
+    if (profile.avatar && oldProfile?.avatar) {
+      await deleteFile(oldProfile.avatar);
+    }
+    if (profile.header && oldProfile?.header) {
+      await deleteFile(oldProfile.header);
+    }
+    const profileData = await Profile.update(
+      { ...profile },
+      {
+        where: {
+          userId: profile.userId,
+        },
+        returning: true,
+      }
+    );
+
+    return profileData[1][0];
+  }
+
+  async follow(subscriberId: number, userId: number) {
+    try {
+      const subscriber = await Profile.findOne({
+        where: {
+          id: subscriberId,
+        },
+      });
+
+      if (!subscriber) {
+        throw ApiError.BadRequest(`User with ${subscriberId} not found`);
+      }
+
+      if (!subscriber.subscribtions?.includes(userId)) {
+        //@ts-ignore
+        subscriber.subscribtions = [...subscriber.subscribtions, userId];
+        await subscriber?.save({
+          fields: ["subscribtions"],
+        });
+      }
+
+
+      const user = await Profile.findOne({
+        where: {
+          id: userId,
+        },
+      });
+      if (!user) {
+        throw ApiError.BadRequest(`User with ${userId} not found`);
+      }
+
+      if (!user.subscribers?.includes(subscriberId)) {
+        user.subscribers = [...user.subscribers, subscriberId];
+        await user.save({
+          fields: ["subscribers"],
+        });
+      }
+
+
+      return 1;
+    } catch (error) {}
+  }
+
+  async unfollow(subscriberId: number, userId: number) {
+    try {
+    } catch (error) {}
+    const subscriber = await Profile.findOne({
+      where: {
+        id: subscriberId,
+      },
+    });
+
+    if (!subscriber) {
+      throw ApiError.BadRequest(`User with ${subscriberId} not found`);
+    }
+
+    subscriber.subscribtions = subscriber.subscribtions?.filter(
+      (item) => item !== userId
+    );
+    await subscriber?.save();
+
+    const user = await Profile.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw ApiError.BadRequest(`User with ${userId} not found`);
+    }
+
+    user.subscribers = user?.subscribers?.filter(
+      (item) => item !== subscriberId
+    );
+    await user?.save();
+
+    return 1;
+  }
+  async getAll() {
+    const profiles = await Profile.findAll();
+
+    return profiles;
   }
 }
 

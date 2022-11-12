@@ -73,7 +73,7 @@ Profile.init(
     userId: {
       type: DataTypes.INTEGER,
       references: {
-        model: "user",
+        model: "users",
         key: "id",
       },
     },
