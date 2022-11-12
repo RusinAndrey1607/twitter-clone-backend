@@ -1,13 +1,14 @@
 import { profileController } from "./../controllers/profileController";
-import express, { Router } from "express";
+import { Router } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { upload } from "../libs/multer";
-import formidable from "express-formidable";
 export const profileRouter = Router();
 
 profileRouter.post("/create", authMiddleware, profileController.createProfile);
-profileRouter.get("/follow", authMiddleware, profileController.follow)
-profileRouter.get("/unfollow", authMiddleware, profileController.unfollow)
+profileRouter.get("/follow", authMiddleware, profileController.follow);
+profileRouter.get("/like", authMiddleware, profileController.like);
+profileRouter.get("/unlike", authMiddleware, profileController.unlike);
+profileRouter.get("/unfollow", authMiddleware, profileController.unfollow);
 profileRouter.put(
   "/update",
   [

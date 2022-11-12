@@ -6,12 +6,14 @@ const connectionString =
   process.env.DATABASE_URL ||
   "postgresql://postgres:root@localhost:5432/node_postgress";
 
-export const sequelize = new Sequelize(connectionString);
+export const sequelize = new Sequelize(connectionString,{
+  logging:false
+});
 
 export const dbConnect = async () => {
   try {
-    await sequelize.authenticate({ logging: false });
-    await sequelize.sync({ alter: true });
+    await sequelize.authenticate();
+    await sequelize.sync({force:true});
 
     console.log("Connect to database");
   } catch (error: any) {

@@ -2,13 +2,13 @@ import { sequelize } from "./../db/sequelize";
 import { DataTypes, Model } from "sequelize";
 import { Comment } from "./comment.model";
 
-interface TweetAttributes extends TweetCreationAttributes {
+export interface TweetAttributes extends TweetCreationAttributes {
   id: number;
   blocked: boolean;
   likes?: number[];
 }
 
-interface TweetCreationAttributes {
+export interface TweetCreationAttributes {
   reply?: number;
   text: string;
   image?: string;

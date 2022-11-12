@@ -1,3 +1,4 @@
+import { tweetService } from "./tweetService";
 import { ApiError } from "../exceptions/apiErrors";
 import {
   Profile,
@@ -87,53 +88,47 @@ class ProfileService {
   }
 
   async follow(subscriberId: number, userId: number) {
-    try {
-      const subscriber = await Profile.findOne({
-        where: {
-          id: subscriberId,
-        },
+    const subscriber = await Profile.findOne({
+      where: {
+        userId: subscriberId,
+      },
+    });
+
+    if (!subscriber) {
+      throw ApiError.BadRequest(`User with ${subscriberId} not found`);
+    }
+
+    if (!subscriber.subscribtions?.includes(userId)) {
+      //@ts-ignore
+      subscriber.subscribtions = [...subscriber.subscribtions, userId];
+      await subscriber?.save({
+        fields: ["subscribtions"],
       });
+    }
 
-      if (!subscriber) {
-        throw ApiError.BadRequest(`User with ${subscriberId} not found`);
-      }
+    const user = await Profile.findOne({
+      where: {
+        id: userId,
+      },
+    });
+    if (!user) {
+      throw ApiError.BadRequest(`User with ${userId} not found`);
+    }
 
-      if (!subscriber.subscribtions?.includes(userId)) {
-        //@ts-ignore
-        subscriber.subscribtions = [...subscriber.subscribtions, userId];
-        await subscriber?.save({
-          fields: ["subscribtions"],
-        });
-      }
-
-
-      const user = await Profile.findOne({
-        where: {
-          id: userId,
-        },
+    if (!user.subscribers?.includes(subscriberId)) {
+      user.subscribers = [...user.subscribers, subscriberId];
+      await user.save({
+        fields: ["subscribers"],
       });
-      if (!user) {
-        throw ApiError.BadRequest(`User with ${userId} not found`);
-      }
+    }
 
-      if (!user.subscribers?.includes(subscriberId)) {
-        user.subscribers = [...user.subscribers, subscriberId];
-        await user.save({
-          fields: ["subscribers"],
-        });
-      }
-
-
-      return 1;
-    } catch (error) {}
+    return;
   }
 
   async unfollow(subscriberId: number, userId: number) {
-    try {
-    } catch (error) {}
     const subscriber = await Profile.findOne({
       where: {
-        id: subscriberId,
+        userId: subscriberId,
       },
     });
 
@@ -160,7 +155,36 @@ class ProfileService {
     );
     await user?.save();
 
-    return 1;
+    return;
+  }
+
+  async like(tweetId: number, userId: number) {
+    const user = await Profile.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    await tweetService.like(tweetId, userId);
+
+    if (user?.likes && !user.likes.includes(tweetId)) {
+      user.likes = [...user.likes, tweetId];
+    }
+    await user?.save();
+    return;
+  }
+  async unlike(tweetId: number, userId: number) {
+    const user = await Profile.findOne({
+      where: {
+        userId: userId,
+      },
+    });
+    await tweetService.unlike(tweetId, userId);
+
+    if (user?.likes) {
+      user.likes = user.likes.filter((item) => item !== tweetId);
+    }
+    await user?.save();
+    return;
   }
   async getAll() {
     const profiles = await Profile.findAll();

@@ -43,7 +43,6 @@ class ProfileController {
       const { id } = req.user;
       // @ts-ignore
       const avatar = req.files["avatar"][0];
-      console.log(avatar);
 
       // @ts-ignore
       const header = req.files["header"][0];
@@ -69,15 +68,23 @@ class ProfileController {
 
   async follow(req: Request, res: Response, next: Function) {
     try {
-      const { userId, subscriberId } = req.query;
+      const { subscriberId } = req.query;
+      // @ts-ignore
+      const { id: userId } = req.user;
 
-      if (!userId || !subscriberId) {
+      if (!subscriberId) {
         throw ApiError.BadRequest(
-          `Incorect Request. You Must pass userId and subsribrId as query parametr`
+          `Incorect Request. You Must pass ubscriberId as query parametr`
+        );
+      }
+
+      if (userId === subscriberId) {
+        throw ApiError.BadRequest(
+          `Incorect Request. userId must not be equal to subscriberId`
         );
       }
       await profileService.follow(+subscriberId, +userId);
-      return res.json("Follow went succes");
+      return res.status(200).send();
     } catch (error) {
       next(error);
     }
@@ -85,19 +92,52 @@ class ProfileController {
 
   async unfollow(req: Request, res: Response, next: Function) {
     try {
-      const { userId, subscriberId } = req.query;
+      const { subscriberId } = req.query;
+      // @ts-ignore
+      const { id: userId } = req.user;
 
-      if (!userId || !subscriberId) {
+      if (!subscriberId) {
         throw ApiError.BadRequest(
-          `Incorect Request. You Must pass userId and subscriberId as query parametr`
+          `Incorect Request. You Must pass ubscriberId as query parametr`
         );
       }
 
+      if (userId === subscriberId) {
+        throw ApiError.BadRequest(
+          `Incorect Request. userId must not be equal to subscriberId`
+        );
+      }
       await profileService.unfollow(+subscriberId, +userId);
-      return res.json("UnFollow went succes");
+      return res.status(200).send();
     } catch (error) {
       next(error);
     }
+  }
+  async like(req: Request, res: Response, next: Function) {
+    const { tweetId } = req.query;
+    // @ts-ignore
+    const { id: userId } = req.user;
+
+    if (!tweetId) {
+      throw ApiError.BadRequest(
+        `Incorect Request. You Must pass tweetId as query parametr`
+      );
+    }
+    await profileService.like(Number(tweetId), Number(userId));
+    return res.status(200).send();
+  }
+  async unlike(req: Request, res: Response, next: Function) {
+    const { tweetId } = req.query;
+    // @ts-ignore
+    const { id: userId } = req.user;
+
+    if (!tweetId) {
+      throw ApiError.BadRequest(
+        `Incorect Request. You Must pass tweetId as query parametr`
+      );
+    }
+    await profileService.unlike(Number(tweetId), Number(userId));
+    return res.status(200).send();
   }
   async getAll(req: Request, res: Response, next: Function) {
     try {
