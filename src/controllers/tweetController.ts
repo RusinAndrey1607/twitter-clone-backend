@@ -10,7 +10,7 @@ class TweetController {
       //   @ts-ignore
       const { id } = req.user;
 
-      if (body.hashTags) {
+      if (body.hashTags && typeof body.hashTags === "string") {
         body.hashTags = JSON.parse(body.hashTags);
       }
       const tweet = await tweetService.addTweet({

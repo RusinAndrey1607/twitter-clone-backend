@@ -2,9 +2,14 @@ import { profileController } from "./../controllers/profileController";
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { upload } from "../libs/multer";
+import { check } from "express-validator";
 export const profileRouter = Router();
 
-profileRouter.post("/create", authMiddleware, profileController.createProfile);
+profileRouter.post(
+  "/create",
+  [check("name").notEmpty(), check("username").notEmpty(), authMiddleware],
+  profileController.createProfile
+);
 profileRouter.get("/follow", authMiddleware, profileController.follow);
 profileRouter.get("/like", authMiddleware, profileController.like);
 profileRouter.get("/unlike", authMiddleware, profileController.unlike);
@@ -14,7 +19,7 @@ profileRouter.put(
   [
     upload.fields([
       { name: "avatar", maxCount: 1 },
-      { name: "header", maxCount: 1 },
+      { name: "header", maxCount: 1  },
     ]),
     authMiddleware,
   ],

@@ -10,7 +10,7 @@ class TweetService {
     const tweets = await Tweet.findAll({
       limit: limit || 10,
       offset: offset || 0,
-      order:["createdAt","DESK"]
+      order:[["createdAt","DESC"]]
     });
     return tweets;
   }
