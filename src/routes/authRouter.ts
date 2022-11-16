@@ -21,3 +21,4 @@ authRouter.post("/login", authController.login);
 authRouter.post("/logout", authController.logout);
 authRouter.get("/refresh", authController.refresh);
 authRouter.get("/", authMiddleware, authController.getAll);
+authRouter.delete("/", authMiddleware, authController.delete);

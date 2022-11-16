@@ -69,13 +69,7 @@ class ProfileController {
     }
   }
 
-  async deleteProfile(req: Request, res: Response, next: Function) {
-    try {
-    } catch (error) {
-      next(error);
-    }
-  }
-
+ 
   async follow(req: Request, res: Response, next: Function) {
     try {
       const { subscriberId } = req.query;
@@ -94,7 +88,7 @@ class ProfileController {
         );
       }
       await profileService.follow(+subscriberId, +userId);
-      return res.status(200).send();
+      return res.status(200).send("successful");
     } catch (error) {
       next(error);
     }
@@ -118,7 +112,7 @@ class ProfileController {
         );
       }
       await profileService.unfollow(+subscriberId, +userId);
-      return res.status(200).send();
+      return res.status(200).send("successful");
     } catch (error) {
       next(error);
     }
@@ -134,7 +128,7 @@ class ProfileController {
       );
     }
     await profileService.like(Number(tweetId), Number(userId));
-    return res.status(200).send();
+    return res.status(200).send("successful");
   }
   async unlike(req: Request, res: Response, next: Function) {
     const { tweetId } = req.query;
@@ -147,12 +141,22 @@ class ProfileController {
       );
     }
     await profileService.unlike(Number(tweetId), Number(userId));
-    return res.status(200).send();
+    return res.status(200).send("successful");
   }
   async getAll(req: Request, res: Response, next: Function) {
     try {
       const profiles = await profileService.getAll();
       return res.json(profiles);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async delete(req: Request, res: Response, next: Function) {
+    try {
+      // @ts-ignore
+      const { id: userId } = req.user;
+      const profile = await profileService.deleteProfile(userId);
+      return res.status(200).json(profile);
     } catch (error) {
       next(error);
     }

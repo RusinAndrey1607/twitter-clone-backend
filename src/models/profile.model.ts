@@ -76,6 +76,8 @@ Profile.init(
         model: "users",
         key: "id",
       },
+      onDelete:"CASCADE"
+
     },
   },
   { sequelize, modelName: "profile", freezeTableName: true }

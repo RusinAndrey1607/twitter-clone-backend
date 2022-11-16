@@ -60,6 +60,20 @@ class ProfileService {
     return profile;
   }
 
+  async deleteProfile(userId: number) {
+    const profile = await Profile.findOne({
+      where: {
+        userId,
+      },
+    });
+
+    profile?.header && (await deleteFile(profile.header));
+    profile?.avatar && (await deleteFile(profile.avatar));
+
+    await profile?.destroy();
+
+    return profile;
+  }
   async updateProfile(profile: ProfileCreationAttributes) {
     const oldProfile = await Profile.findOne({
       where: {

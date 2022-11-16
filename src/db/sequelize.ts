@@ -13,7 +13,7 @@ export const sequelize = new Sequelize(connectionString,{
 export const dbConnect = async () => {
   try {
     await sequelize.authenticate();
-    await sequelize.sync();
+    await sequelize.sync({alter:true});
 
     console.log("Connect to database");
   } catch (error: any) {

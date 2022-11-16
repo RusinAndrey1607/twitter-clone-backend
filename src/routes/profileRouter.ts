@@ -7,7 +7,11 @@ export const profileRouter = Router();
 
 profileRouter.post(
   "/create",
-  [check("name").notEmpty(), check("username").notEmpty(), authMiddleware],
+  [
+    authMiddleware,
+    check("name").notEmpty().withMessage("Name cannot be empty"),
+    check("username").notEmpty().withMessage("Username cannot be empty"),
+  ],
   profileController.createProfile
 );
 profileRouter.get("/follow", authMiddleware, profileController.follow);
@@ -17,19 +21,14 @@ profileRouter.get("/unfollow", authMiddleware, profileController.unfollow);
 profileRouter.put(
   "/update",
   [
+    authMiddleware,
     upload.fields([
       { name: "avatar", maxCount: 1 },
-      { name: "header", maxCount: 1  },
+      { name: "header", maxCount: 1 },
     ]),
-    authMiddleware,
   ],
   profileController.updateProfile
 );
 profileRouter.get("/:username", authMiddleware, profileController.getProfile);
-// profileRouter.get("/", authMiddleware, profileController.getProfile);
-profileRouter.delete(
-  "/delete/:id",
-  authMiddleware,
-  profileController.deleteProfile
-);
 profileRouter.get("/", authMiddleware, profileController.getAll);
+profileRouter.delete("/", authMiddleware, profileController.delete);

@@ -26,6 +26,7 @@ Token.init(
         model: User,
         key: "id",
       },
+      onDelete:"CASCADE"
     },
   },
   {

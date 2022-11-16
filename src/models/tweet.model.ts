@@ -21,7 +21,7 @@ export class Tweet extends Model<TweetAttributes, TweetCreationAttributes> {
   declare author: number;
   declare reply: number;
   declare blocked: boolean;
-  declare image?: number;
+  declare image?: string;
   declare likes?: number[];
   declare comments?: number[];
 
@@ -39,6 +39,8 @@ Tweet.init(
         model: "users",
         key: "id",
       },
+      onDelete:"CASCADE"
+
     },
     text: { type: DataTypes.STRING, allowNull: false },
     hashTags: {
@@ -54,6 +56,8 @@ Tweet.init(
         model: 'tweet',
         key: "id",
       },
+      onDelete:"CASCADE"
+
     },
     blocked: { type: DataTypes.BOOLEAN, defaultValue: false },
     likes: {
