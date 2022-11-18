@@ -83,7 +83,3 @@ Profile.init(
   { sequelize, modelName: "profile", freezeTableName: true }
 );
 
-Profile.hasMany(Tweet, {
-  foreignKey: "author",
-  onDelete: "CASCADE",
-});

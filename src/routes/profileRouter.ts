@@ -3,7 +3,9 @@ import { Router } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { upload } from "../libs/multer";
 import { check } from "express-validator";
+import bodyParser from "body-parser";
 export const profileRouter = Router();
+
 
 profileRouter.post(
   "/create",
@@ -30,5 +32,5 @@ profileRouter.put(
   profileController.updateProfile
 );
 profileRouter.get("/:username", authMiddleware, profileController.getProfile);
-profileRouter.get("/", authMiddleware, profileController.getAll);
+profileRouter.get("/", authMiddleware, profileController.getByQuery);
 profileRouter.delete("/", authMiddleware, profileController.delete);

@@ -1,3 +1,4 @@
+import { profileService } from "./../services/profileService";
 import { tweetService } from "./../services/tweetService";
 import { NextFunction, Request, Response } from "express";
 import { validationResult } from "express-validator";
@@ -6,12 +7,12 @@ import { ApiError } from "../exceptions/apiErrors";
 class TweetController {
   async create(req: Request, res: Response, next: NextFunction) {
     try {
-     
       const image = req.file?.filename;
       const body = req.body;
 
       //   @ts-ignore
       const { id } = req.user;
+      const profile = await profileService.getProfileById(id);
 
       if (body.hashTags && typeof body.hashTags === "string") {
         body.hashTags = JSON.parse(body.hashTags);
@@ -19,7 +20,7 @@ class TweetController {
       const tweet = await tweetService.addTweet({
         ...body,
         image,
-        author: id,
+        author: profile.id,
       });
 
       return res.status(200).json(tweet);
@@ -53,7 +54,9 @@ class TweetController {
     try {
       const body = req.body;
       // @ts-ignore
-      const { id: authorId } = req.user;
+      const { id } = req.user;
+      const profile = await profileService.getProfileById(id);
+
       const image = req.file?.filename;
 
       if (image) {
@@ -63,7 +66,7 @@ class TweetController {
         {
           ...body,
         },
-        authorId
+        profile.id
       );
       return res.status(200).json(tweet);
     } catch (error) {

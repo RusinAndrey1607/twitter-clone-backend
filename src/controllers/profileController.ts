@@ -69,25 +69,28 @@ class ProfileController {
     }
   }
 
- 
   async follow(req: Request, res: Response, next: Function) {
     try {
-      const { subscriberId } = req.query;
-      // @ts-ignore
-      const { id: userId } = req.user;
+      const { accountId } = req.query;
+      const { userId } = req.query;
 
-      if (!subscriberId) {
+      if (!accountId) {
         throw ApiError.BadRequest(
-          `Incorect Request. You Must pass ubscriberId as query parametr`
+          `Incorect Request. You Must pass accountId as query parametr`
+        );
+      }
+      if (!userId) {
+        throw ApiError.BadRequest(
+          `Incorect Request. You Must pass userId as query parametr`
         );
       }
 
-      if (userId === subscriberId) {
+      if (userId === accountId) {
         throw ApiError.BadRequest(
-          `Incorect Request. userId must not be equal to subscriberId`
+          `Incorect Request. userId must not be equal to accountId`
         );
       }
-      await profileService.follow(+subscriberId, +userId);
+      await profileService.follow(+accountId, +userId);
       return res.status(200).send("successful");
     } catch (error) {
       next(error);
@@ -96,22 +99,26 @@ class ProfileController {
 
   async unfollow(req: Request, res: Response, next: Function) {
     try {
-      const { subscriberId } = req.query;
-      // @ts-ignore
-      const { id: userId } = req.user;
+      const { accountId } = req.query;
+      const { userId } = req.query;
 
-      if (!subscriberId) {
+      if (!accountId) {
         throw ApiError.BadRequest(
-          `Incorect Request. You Must pass ubscriberId as query parametr`
+          `Incorect Request. You Must pass accountId as query parametr`
+        );
+      }
+      if (!userId) {
+        throw ApiError.BadRequest(
+          `Incorect Request. You Must pass userId as query parametr`
         );
       }
 
-      if (userId === subscriberId) {
+      if (userId === accountId) {
         throw ApiError.BadRequest(
-          `Incorect Request. userId must not be equal to subscriberId`
+          `Incorect Request. userId must not be equal to accountId`
         );
       }
-      await profileService.unfollow(+subscriberId, +userId);
+      await profileService.unfollow(+accountId, +userId);
       return res.status(200).send("successful");
     } catch (error) {
       next(error);
@@ -119,8 +126,7 @@ class ProfileController {
   }
   async like(req: Request, res: Response, next: Function) {
     const { tweetId } = req.query;
-    // @ts-ignore
-    const { id: userId } = req.user;
+    const { userId } = req.query;
 
     if (!tweetId) {
       throw ApiError.BadRequest(
@@ -132,8 +138,7 @@ class ProfileController {
   }
   async unlike(req: Request, res: Response, next: Function) {
     const { tweetId } = req.query;
-    // @ts-ignore
-    const { id: userId } = req.user;
+    const { userId } = req.query;
 
     if (!tweetId) {
       throw ApiError.BadRequest(
@@ -143,9 +148,16 @@ class ProfileController {
     await profileService.unlike(Number(tweetId), Number(userId));
     return res.status(200).send("successful");
   }
-  async getAll(req: Request, res: Response, next: Function) {
+  async getByQuery(req: Request, res: Response, next: Function) {
     try {
-      const profiles = await profileService.getAll();
+      const { query } = req.query;
+      const { limit } = req.query;
+      const { offset } = req.query;
+      //@ts-ignore
+      const profiles = await profileService.getByQuery( query,
+        Number(limit),
+        Number(offset)
+      );
       return res.json(profiles);
     } catch (error) {
       next(error);

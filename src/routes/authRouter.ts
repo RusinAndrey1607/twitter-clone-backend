@@ -10,9 +10,9 @@ authRouter.post(
   [
     check("email").isEmail(),
     check("password")
-      .isLength({ min: 5, max: 32 })
+      .isLength({ min: 4, max: 32 })
       .withMessage(
-        "Password must contain at least 5 chars and cannot be longer than 32"
+        "Password must contain at least 4 chars and cannot be longer than 32"
       ),
   ],
   authController.registration

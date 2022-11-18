@@ -1,5 +1,6 @@
 import { commentService } from "./../services/commentService";
 import { Request, Response } from "express";
+import { profileService } from "../services/profileService";
 
 class CommentController {
   async addCommnet(req: Request, res: Response, next: Function) {
@@ -8,11 +9,13 @@ class CommentController {
       const { id } = req.user;
       const body = req.body;
 
+      const profile = await profileService.getProfileById(id);
+
       const image = req.file?.filename;
 
       const comment = await commentService.addComment({
         ...body,
-        author: id,
+        author: profile.id,
         image,
       });
       return res.status(200).json(comment);
@@ -25,7 +28,6 @@ class CommentController {
       const { id: tweetId } = req.params;
       const { limit, offset } = req.query;
 
-      console.log(tweetId);
 
       const comments = await commentService.getCommentsByTweetId(
         Number(tweetId),
@@ -41,8 +43,7 @@ class CommentController {
       const { id: userId } = req.user;
       const { id: commentId } = req.params;
 
-      console.log(commentId);
-      
+
       const comment = await commentService.deleteComment(+commentId, +userId);
       return res.status(200).json(comment);
     } catch (error) {

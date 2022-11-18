@@ -37,7 +37,7 @@ Comment.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "users",
+        model: "profile",
         key: "id",
       },
       onDelete: "CASCADE",

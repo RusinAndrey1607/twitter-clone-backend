@@ -6,6 +6,7 @@ import {
   ProfileCreationAttributes,
 } from "../models/profile.model";
 import { deleteFile } from "../utils/deleteUtil";
+import { sequelize } from "../db/sequelize";
 
 class ProfileService {
   async createProfile(
@@ -101,22 +102,22 @@ class ProfileService {
     return profileData[1][0];
   }
 
-  async follow(subscriberId: number, userId: number) {
-    const subscriber = await Profile.findOne({
+  async follow(accountId: number, userId: number) {
+    const account = await Profile.findOne({
       where: {
-        userId: subscriberId,
+        id: accountId,
       },
     });
 
-    if (!subscriber) {
-      throw ApiError.BadRequest(`User with ${subscriberId} not found`);
+    if (!account) {
+      throw ApiError.BadRequest(`User with id ${accountId} not found`);
     }
 
-    if (!subscriber.subscribtions?.includes(userId)) {
+    if (!account.subscribers?.includes(userId)) {
       //@ts-ignore
-      subscriber.subscribtions = [...subscriber.subscribtions, userId];
-      await subscriber?.save({
-        fields: ["subscribtions"],
+      account.subscribers = [...account.subscribers, userId];
+      await account?.save({
+        fields: ["subscribers"],
       });
     }
 
@@ -129,31 +130,34 @@ class ProfileService {
       throw ApiError.BadRequest(`User with ${userId} not found`);
     }
 
-    if (!user.subscribers?.includes(subscriberId)) {
-      user.subscribers = [...user.subscribers, subscriberId];
+    if (!user.subscribtions?.includes(accountId)) {
+      user.subscribtions = [...user.subscribtions, accountId];
       await user.save({
-        fields: ["subscribers"],
+        fields: ["subscribtions"],
       });
     }
 
     return;
   }
 
-  async unfollow(subscriberId: number, userId: number) {
-    const subscriber = await Profile.findOne({
+  async unfollow(accountId: number, userId: number) {
+    const account = await Profile.findOne({
       where: {
-        userId: subscriberId,
+        id: accountId,
       },
     });
 
-    if (!subscriber) {
-      throw ApiError.BadRequest(`User with ${subscriberId} not found`);
+    if (!account) {
+      throw ApiError.BadRequest(`User with id ${accountId} not found`);
     }
 
-    subscriber.subscribtions = subscriber.subscribtions?.filter(
-      (item) => item !== userId
-    );
-    await subscriber?.save();
+    if (account.subscribers?.includes(userId)) {
+      //@ts-ignore
+      account.subscribers = account.subscribers.filter(
+        (item) => item != userId
+      );
+      await account.save();
+    }
 
     const user = await Profile.findOne({
       where: {
@@ -164,18 +168,19 @@ class ProfileService {
       throw ApiError.BadRequest(`User with ${userId} not found`);
     }
 
-    user.subscribers = user?.subscribers?.filter(
-      (item) => item !== subscriberId
-    );
-    await user?.save();
-
+    if (user.subscribtions?.includes(accountId)) {
+      user.subscribtions = user.subscribtions.filter(
+        (item) => item != accountId
+      );
+      await user.save();
+    }
     return;
   }
 
   async like(tweetId: number, userId: number) {
     const user = await Profile.findOne({
       where: {
-        userId: userId,
+        id: userId,
       },
     });
     await tweetService.like(tweetId, userId);
@@ -189,7 +194,7 @@ class ProfileService {
   async unlike(tweetId: number, userId: number) {
     const user = await Profile.findOne({
       where: {
-        userId: userId,
+        id: userId,
       },
     });
     await tweetService.unlike(tweetId, userId);
@@ -200,10 +205,17 @@ class ProfileService {
     await user?.save();
     return;
   }
-  async getAll() {
-    const profiles = await Profile.findAll();
+  async getByQuery(q: string = "", limit: number = 20, offset: number = 0) {
+    const profileQuery = q.toLocaleLowerCase()
+      ? q.toLocaleLowerCase() + "%"
+      : "%";
+    const profiles = await sequelize.query(
+      `SELECT name,avatar,username, cardinality(subscribers)  as subscribers  FROM profile WHERE LOWER(name)  LIKE '${profileQuery}' ORDER BY subscribers DESC LIMIT ${
+        limit ? limit : 20
+      } OFFSET ${offset ? offset : 0}`
+    );
 
-    return profiles;
+    return profiles[0];
   }
 }
 

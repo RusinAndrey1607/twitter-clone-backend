@@ -1,3 +1,4 @@
+import { Profile } from "./profile.model";
 import { sequelize } from "./../db/sequelize";
 import { DataTypes, Model } from "sequelize";
 import { Comment } from "./comment.model";
@@ -36,11 +37,10 @@ Tweet.init(
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: "users",
+        model: "profile",
         key: "id",
       },
-      onDelete:"CASCADE"
-
+      onDelete: "CASCADE",
     },
     text: { type: DataTypes.STRING, allowNull: false },
     hashTags: {
@@ -53,11 +53,10 @@ Tweet.init(
       type: DataTypes.INTEGER,
       allowNull: true,
       references: {
-        model: 'tweet',
+        model: "tweet",
         key: "id",
       },
-      onDelete:"CASCADE"
-
+      onDelete: "CASCADE",
     },
     blocked: { type: DataTypes.BOOLEAN, defaultValue: false },
     likes: {
@@ -69,7 +68,7 @@ Tweet.init(
   {
     sequelize,
     modelName: "tweet",
-    freezeTableName: true
+    freezeTableName: true,
   }
 );
 
@@ -77,3 +76,4 @@ Tweet.hasMany(Comment, {
   foreignKey: "tweet",
   onDelete: "CASCADE",
 });
+Tweet.belongsTo(Profile);

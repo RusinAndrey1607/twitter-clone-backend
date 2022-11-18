@@ -1,3 +1,4 @@
+import { sequelize } from "../db/sequelize";
 import { ApiError } from "../exceptions/apiErrors";
 import { Comment, CommentCreationAttributes } from "../models/comment.model";
 import { deleteFile } from "../utils/deleteUtil";
@@ -16,13 +17,9 @@ class CommentService {
   ) {
     console.log(tweetId);
 
-    const comments = await Comment.findAll({
-      where: {
-        tweet: tweetId,
-      },
-    });
+    const comments = await sequelize.query(`SELECT c.text, c.image,c.likes, c."createdAt", p.name as author ,p.username as author_username, p.avatar FROM comment c JOIN profile p ON c.author = p.id LIMIT ${limit ||10} OFFSET ${offset || 0};`)
 
-    return comments;
+    return comments[0];
   }
   async deleteComment(commentId: number, userId: number) {
     const comment = await Comment.findByPk(commentId);
