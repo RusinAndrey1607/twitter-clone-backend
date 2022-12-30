@@ -4,8 +4,8 @@ import { Token } from '../models/token.model'
 
 class TokenService {
     async generateTokens(payload: UserDto) {
-        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET_KEY || "secret", { expiresIn: "1day" })
-        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET_KEY || "secret", { expiresIn: "30m" })
+        const accessToken = jwt.sign(payload, process.env.JWT_ACCESS_SECRET_KEY || "secret", { expiresIn: "30min" })
+        const refreshToken = jwt.sign(payload, process.env.JWT_REFRESH_SECRET_KEY || "secret", { expiresIn: "30day" })
 
         return {
             accessToken, refreshToken

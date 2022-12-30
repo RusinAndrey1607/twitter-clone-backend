@@ -18,6 +18,7 @@ class ProfileService {
       },
     });
     if (candidate) {
+      profile?.avatar && await deleteFile(profile.avatar)
       throw ApiError.BadRequest(`Profile already created`);
     }
 
@@ -28,6 +29,8 @@ class ProfileService {
     });
 
     if (isUsernameUsed) {
+      profile?.avatar && await deleteFile(profile.avatar)
+
       throw ApiError.BadRequest(
         `Username ${profile.username} already used. Choose another one`
       );
@@ -210,7 +213,7 @@ class ProfileService {
       ? q.toLocaleLowerCase() + "%"
       : "%";
     const profiles = await sequelize.query(
-      `SELECT name,avatar,username, cardinality(subscribers)  as subscribers  FROM profile WHERE LOWER(name)  LIKE '${profileQuery}' ORDER BY subscribers DESC LIMIT ${
+      `SELECT name,avatar,username, bio, header,"createdAt", cardinality(subscribers)  as subscribers  FROM profile WHERE LOWER(name)  LIKE '${profileQuery}' ORDER BY subscribers DESC LIMIT ${
         limit ? limit : 20
       } OFFSET ${offset ? offset : 0}`
     );

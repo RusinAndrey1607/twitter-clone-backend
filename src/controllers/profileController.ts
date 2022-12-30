@@ -1,17 +1,22 @@
 import { ApiError } from "./../exceptions/apiErrors";
 import { profileService } from "./../services/profileService";
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
 
 class ProfileController {
   async createProfile(req: Request, res: Response, next: Function) {
     try {
-      const errors = validationResult(req);
-
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest("Validation Failed", errors.array()));
-      }
       const body = req.body;
+      // @ts-ignore
+      const avatar = req.files["avatar"];
+      // @ts-ignore
+      const header = req.files["header"];
+
+      if (header) {
+        body.header = header[0].filename;
+      }
+      if (avatar) {
+        body.avatar = avatar[0].filename;
+      }
       // @ts-ignore
       const { id } = req.user;
       const profile = await profileService.createProfile({
@@ -24,6 +29,15 @@ class ProfileController {
     }
   }
 
+  async checkUsername(req: Request, res: Response, next: Function) {
+    try {
+      const { username } = req.params;
+      const profile = await profileService.getProfileByUsername(username);
+      return res.status(200).json(true);
+    } catch (error) {
+      return res.status(200).json(false);
+    }
+  }
   async getProfile(req: Request, res: Response, next: Function) {
     try {
       const { username } = req.params;

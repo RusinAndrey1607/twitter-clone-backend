@@ -2,8 +2,6 @@ import { profileController } from "./../controllers/profileController";
 import { Router } from "express";
 import { authMiddleware } from "../middlewares/authMiddleware";
 import { upload } from "../libs/multer";
-import { check } from "express-validator";
-import bodyParser from "body-parser";
 export const profileRouter = Router();
 
 
@@ -11,8 +9,12 @@ profileRouter.post(
   "/create",
   [
     authMiddleware,
-    check("name").notEmpty().withMessage("Name cannot be empty"),
-    check("username").notEmpty().withMessage("Username cannot be empty"),
+    
+    // upload.single("avatar")
+    upload.fields([
+      { name: "avatar", maxCount: 1 },
+      { name: "header", maxCount: 1 },
+    ]),
   ],
   profileController.createProfile
 );
@@ -32,5 +34,6 @@ profileRouter.put(
   profileController.updateProfile
 );
 profileRouter.get("/:username", authMiddleware, profileController.getProfile);
+profileRouter.get("/check/:username", profileController.checkUsername);
 profileRouter.get("/", authMiddleware, profileController.getByQuery);
 profileRouter.delete("/", authMiddleware, profileController.delete);

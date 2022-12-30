@@ -1,4 +1,4 @@
-import { sequelize } from './../db/sequelize';
+import { sequelize } from "./../db/sequelize";
 import { ApiError } from "./../exceptions/apiErrors";
 import { TweetAttributes } from "./../models/tweet.model";
 import { TweetCreationAttributes, Tweet } from "../models/tweet.model";
@@ -36,8 +36,11 @@ class TweetService {
     return updatedTweet[1][0];
   }
   async getTweets(limit: number = 10, offset: number = 0) {
-   
-    const tweets = await sequelize.query(`SELECT t.id, t.text,t."hashTags", t.image, t.likes, t.reply, p.name as author ,p.username as author_username, p.avatar FROM tweet as t  JOIN profile as p ON p.id = t.author LIMIT ${limit || 10} OFFSET ${offset || 0};`)
+    const tweets = await sequelize.query(
+      `SELECT t.id, t.text,t."hashTags",t."createdAt", t.image, t.likes, t.reply, p.name as author ,p.username as author_username, p.avatar FROM tweet as t  JOIN profile as p ON p.id = t.author LIMIT ${
+        limit || 10
+      } OFFSET ${offset || 0};`
+    );
     return tweets[0];
   }
   async like(tweetId: number, userId: number) {
@@ -73,8 +76,11 @@ class TweetService {
 
     return tweet;
   }
-  async getOne(tweetId: number) {
-    const tweet = await Tweet.findByPk(tweetId);
+  async getOne(id: number) {
+    const tweet = await Tweet.findByPk(id);
+    if (!tweet) {
+      throw ApiError.BadRequest(`Tweet with id ${id} not found`);
+    }
     return tweet;
   }
 }
