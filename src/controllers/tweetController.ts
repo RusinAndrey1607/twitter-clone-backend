@@ -1,8 +1,6 @@
 import { profileService } from "./../services/profileService";
 import { tweetService } from "./../services/tweetService";
 import { NextFunction, Request, Response } from "express";
-import { validationResult } from "express-validator";
-import { ApiError } from "../exceptions/apiErrors";
 
 class TweetController {
   async create(req: Request, res: Response, next: NextFunction) {
@@ -79,8 +77,9 @@ class TweetController {
       const { id } = req.params;
 
       // @ts-ignore
-      const { id: authorId } = req.user;
-      const tweet = await tweetService.delete(+id, authorId);
+      const { id:authorId } = req.user;
+      const profile = await profileService.getProfileById(authorId);
+      const tweet = await tweetService.delete(+id, profile.id);
       return res.status(200).json(tweet);
     } catch (error) {
       next(error);

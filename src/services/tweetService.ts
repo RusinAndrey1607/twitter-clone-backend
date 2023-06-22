@@ -37,7 +37,7 @@ class TweetService {
   }
   async getTweets(limit: number = 10, offset: number = 0) {
     const tweets = await sequelize.query(
-      `SELECT t.id, t.text,t."hashTags",t."createdAt", t.image, t.likes, t.reply, p.name as author ,p.username as author_username, p.avatar FROM tweet as t  JOIN profile as p ON p.id = t.author LIMIT ${
+      `SELECT t.id, t.text,t."hashTags",t."createdAt", t.image,t.author as author_id, t.likes, t.reply, p.name as author ,p.username as author_username, p.avatar FROM tweet as t  JOIN profile as p ON p.id = t.author LIMIT ${
         limit || 10
       } OFFSET ${offset || 0};`
     );
