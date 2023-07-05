@@ -9,7 +9,6 @@ import { errorMiddleware } from "./middlewares/errorMiddleware";
 import { tweetRouter } from "./routes/tweetRouter";
 import { commentRouter } from "./routes/commentRouter";
 import path from "path";
-import { upload } from "./libs/multer";
 config();
 
 const port = process.env.PORT || 8000;
@@ -20,7 +19,7 @@ app.use(express.json({limit:1000000,
 }));
 app.use(cookieParser());
 app.use(cors({
-  origin:["http://localhost:3000"],
+  origin:[process.env.FRONTEND_URL || "http://localhost:3000" ],
   credentials:true
 }));
 app.use("/auth", authRouter);
@@ -29,9 +28,6 @@ app.use("/tweet", tweetRouter);
 app.use("/comment", commentRouter);
 app.use(errorMiddleware);
 
-app.post("/test", upload.single("avatar"), (req, res) => {
-  return res.send(req.file);
-});
 
 const start = async () => {
   try {

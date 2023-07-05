@@ -40,15 +40,18 @@ class ProfileController {
   }
   async getProfile(req: Request, res: Response, next: Function) {
     try {
-      const { username } = req.params;
       // @ts-ignore
       const { id } = req.user;
+      const profile = await profileService.getProfileById(id);
+      return res.status(200).json(profile);
+    } catch (error) {
+      next(error);
+    }
+  }
 
-      if (!username) {
-        const profile = await profileService.getProfileById(id);
-        return res.status(200).json(profile);
-      }
-
+  async getProfileByUserName(req: Request, res: Response, next: Function) {
+    try {
+      const { username } = req.params;
       const profile = await profileService.getProfileByUsername(username);
       return res.status(200).json(profile);
     } catch (error) {
@@ -177,12 +180,20 @@ class ProfileController {
       next(error);
     }
   }
-  async delete(req: Request, res: Response, next: Function) {
+ async delete(req: Request, res: Response, next: Function) {
     try {
       // @ts-ignore
       const { id: userId } = req.user;
       const profile = await profileService.deleteProfile(userId);
       return res.status(200).json(profile);
+    } catch (error) {
+      next(error);
+    }
+  } 
+  async getUsernames(req: Request, res: Response, next: Function) {
+    try {
+      const usernames = await profileService.getUsernames();
+      return res.status(200).json(usernames);
     } catch (error) {
       next(error);
     }

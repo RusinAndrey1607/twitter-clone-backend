@@ -52,6 +52,12 @@ class ProfileService {
     }
     return profile;
   }
+  async getUsernames(){
+      const usernames = await Profile.findAll({
+        attributes:["username"]
+      })
+      return usernames
+  }
   async getProfileByUsername(username: string): Promise<ProfileAttributes> {
     const profile = await Profile.findOne({
       where: {

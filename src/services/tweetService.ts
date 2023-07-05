@@ -35,13 +35,14 @@ class TweetService {
     );
     return updatedTweet[1][0];
   }
-  async getTweets(limit: number = 10, offset: number = 0) {
+  async getTweets(limit: number = 20, offset: number = 0) {
     const tweets = await sequelize.query(
-      `SELECT t.id, t.text,t."hashTags",t."createdAt", t.image,t.author as author_id, t.likes, t.reply, p.name as author ,p.username as author_username, p.avatar FROM tweet as t  JOIN profile as p ON p.id = t.author LIMIT ${
-        limit || 10
-      } OFFSET ${offset || 0};`
+      `SELECT t.id, t.text,t."hashTags",t."createdAt", t.image,t.author as author_id, t.likes, t.reply, p.name as author ,p.username as author_username, p.avatar FROM tweet as t  JOIN profile as p ON p.id = t.author ORDER BY t.id DESC LIMIT ${
+        limit || 20
+      } OFFSET ${offset || 0} ;`
     );
-    return tweets[0];
+    const count = await Tweet.count();
+    return { tweets: tweets[0], count };
   }
   async like(tweetId: number, userId: number) {
     const tweet = await Tweet.findByPk(tweetId);

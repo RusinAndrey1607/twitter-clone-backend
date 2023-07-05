@@ -2,7 +2,6 @@ import { authMiddleware } from "./../middlewares/authMiddleware";
 import { tweetController } from "./../controllers/tweetController";
 import { Router } from "express";
 import { upload } from "../libs/multer";
-import { check } from "express-validator";
 
 export const tweetRouter = Router();
 

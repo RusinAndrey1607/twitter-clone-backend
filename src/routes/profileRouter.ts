@@ -32,8 +32,10 @@ profileRouter.put(
     ]),
   ],
   profileController.updateProfile
-);
-profileRouter.get("/:username", authMiddleware, profileController.getProfile);
+); 
+profileRouter.get("/", authMiddleware, profileController.getProfile);
+profileRouter.get("/paths", profileController.getUsernames);
+profileRouter.get("/:username", profileController.getProfileByUserName);
 profileRouter.get("/check/:username", profileController.checkUsername);
 profileRouter.get("/", authMiddleware, profileController.getByQuery);
 profileRouter.delete("/", authMiddleware, profileController.delete);
