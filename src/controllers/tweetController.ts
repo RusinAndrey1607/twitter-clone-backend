@@ -85,6 +85,32 @@ class TweetController {
       next(error);
     }
   }
+  // async like(req: Request, res: Response, next: Function) {
+  //   try {
+  //     const { id } = req.params;
+  //     // @ts-ignore
+  //     const { id:authorId } = req.user;
+
+  //     const profile = await profileService.getProfileById(authorId);
+  //     const tweet = await tweetService.like(+id, profile.id);
+  //     return res.status(200).json(tweet);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
+  // async unlike(req: Request, res: Response, next: Function) {
+  //   try {
+  //     const { id } = req.params;
+  //     // @ts-ignore
+  //     const { id:authorId } = req.user;
+
+  //     const profile = await profileService.getProfileById(authorId);
+  //     const tweet = await tweetService.unlike(+id, profile.id);
+  //     return res.status(200).json(tweet);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 }
 
 export const tweetController = new TweetController();

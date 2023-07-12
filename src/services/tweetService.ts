@@ -44,24 +44,24 @@ class TweetService {
     const count = await Tweet.count();
     return { tweets: tweets[0], count };
   }
-  async like(tweetId: number, userId: number) {
+  async like(tweetId: number, profileId: number) {
     const tweet = await Tweet.findByPk(tweetId);
-    if (tweet?.likes && !tweet.likes.includes(userId)) {
-      tweet.likes = [...tweet.likes, userId];
+    if (tweet?.likes && !tweet.likes.includes(profileId)) {
+      tweet.likes = [...tweet.likes, profileId];
     }
     await tweet?.save();
 
-    return;
+    return tweet;
   }
-  async unlike(tweetId: number, userId: number) {
+  async unlike(tweetId: number, profileId: number) {
     const tweet = await Tweet.findByPk(tweetId);
 
     if (tweet?.likes) {
-      tweet.likes = tweet.likes.filter((item) => item !== userId);
+      tweet.likes = tweet.likes.filter((item) => item !== profileId);
     }
     await tweet?.save();
 
-    return;
+    return tweet;
   }
   async delete(tweetId: number, userId: number) {
     const tweet = await Tweet.findByPk(tweetId);
