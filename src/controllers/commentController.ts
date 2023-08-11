@@ -27,8 +27,6 @@ class CommentController {
     try {
       const { id: tweetId } = req.params;
       const { limit, offset } = req.query;
-
-
       const comments = await commentService.getCommentsByTweetId(
         Number(tweetId),
         Number(limit),
